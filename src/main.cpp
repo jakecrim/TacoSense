@@ -1,8 +1,16 @@
 #include <Arduino.h>
 #include <esp_now.h>
 #include <WiFi.h>
+#include "transmission.h"
 
-// Variables
+/* Defines */
+// sizes
+#define TRANSMIT_TASK_STACK_SIZE 10000
+// priority levels
+#define TRANSMIT_TASK_PRIO 1
+
+
+/* Variables */
 typedef struct transcieve_message {
 	int distance;
 } transcieve_message;
@@ -14,25 +22,29 @@ void wireless_Open(void);
 esp_now_recv_cb_t receive_message(void);
 esp_now_send_cb_t sent_message(void);
 void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen);
-void transmit(const String &data);
-void transmit2(transcieve_message data);
+void transmit(transcieve_message data);
+void tasks_Open();
 
 
 int main(void)
 {
-	Serial.println(" TEST 1:)");
-
+	printf("TacoSense System Start: \n");
+	tasks_Open();
+	printf("[T] YO");
 	transcieve_message message1;
 
 	wireless_Open();
 	for(;;)
 	{
 		delay(2500);
-		// transmit("howdy partner");
 		message1.distance = 15;
-		transmit2(message1);
-		// transmit2((uint8_t *) &message1);
+		transmit(message1);
 	}
+}
+
+void tasks_Open()
+{
+	xTaskCreate(vTransmitTask, "Transmit Task", TRANSMIT_TASK_STACK_SIZE, NULL, TRANSMIT_TASK_PRIO, NULL);
 }
 
 void wireless_Open()
@@ -57,7 +69,7 @@ void wireless_Open()
 	
 }
 
-void transmit2(transcieve_message data)
+void transmit(transcieve_message data)
 {
 	// Transmits to any device in range
 	uint8_t transmitAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -121,15 +133,15 @@ void transmit(const String &data)
 	esp_err_t result = esp_now_send(peerAddress, (const uint8_t *)message.c_str(), message.length());*/
 	if (result == ESP_OK)
 	{
-		Serial.println("Broadcast message success");
+		Serial.println("Transmit success");
 	}
 	else if (result == ESP_ERR_ESPNOW_NOT_INIT)
 	{
-		Serial.println("ESPNOW not Init.");
+		Serial.println("ESPNOW not Initialized.");
 	}
 	else if (result == ESP_ERR_ESPNOW_ARG)
 	{
-		Serial.println("Invalid Argument");
+		Serial.println("Invalid Arg");
 	}
 	else if (result == ESP_ERR_ESPNOW_INTERNAL)
 	{
@@ -141,7 +153,7 @@ void transmit(const String &data)
 	}
 	else if (result == ESP_ERR_ESPNOW_NOT_FOUND)
 	{
-		Serial.println("Peer not found.");
+		Serial.println("Peer was not found.");
 	}
 	else
 	{
@@ -157,20 +169,9 @@ void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 	printf("Bytes Recieved: %d \n", dataLen);
 
 	printf("Distance: %d \n", recieved.distance);
-
-	// // only allow a maximum of 250 characters in the message + a null terminating byte
-	// char buffer[ESP_NOW_MAX_DATA_LEN + 1];
-	// int msgLen = min(ESP_NOW_MAX_DATA_LEN, dataLen);
-	// printf("data -->%c ", *data);
-	// strncpy(buffer, (const char *)data, msgLen);
-	// // make sure we are null terminated
-	// buffer[msgLen] = 0;
-	// // format the mac address
-	// char macStr[18];
-	// // debug log the message to the serial port
-	// Serial.printf("Received message from: %s - %c\n", macStr, *buffer);
 }
 
+//  to be used later as cb func for sending
 // esp_now_send_cb_t sent_message()
 // {
 
@@ -185,8 +186,8 @@ void setup()
 	main();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop() 
+{
 	Serial.println("YOOOO");
 	delay(1000);
 }
