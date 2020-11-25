@@ -28,10 +28,14 @@ int main(void)
 	}
 }
 
+// Scheduling the tasks 
 void tasks_Open()
 {
-	xTaskCreate(vTransmitTask, "Transmit Task", TRANSMIT_TASK_STACK_SIZE, NULL, TRANSMIT_TASK_PRIO, NULL);
-	xTaskCreate(vSensorTask, "Sensor Task", SENSOR_TASK_STACK_SIZE, NULL, SENSOR_TASK_PRIO, NULL);
+	// shared message between threads
+	struct transcieve_message messageShared;
+	messageShared.distance1 = 69;
+	xTaskCreate(vTransmitTask, "Transmit Task", TRANSMIT_TASK_STACK_SIZE, (void *) &messageShared, TRANSMIT_TASK_PRIO, NULL);
+	xTaskCreate(vSensorTask, "Sensor Task", SENSOR_TASK_STACK_SIZE, (void *) &messageShared, SENSOR_TASK_PRIO, NULL);
 }
 
 void setup() 

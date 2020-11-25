@@ -1,9 +1,13 @@
 #include "transmission.h"
+#include "sensor.h"
 
 // Main Transmitting Task
 void vTransmitTask(void * parameter)
 {
+	// message structure instance
 	transcieve_message message1;
+	transcieve_message * messageShared = (transcieve_message*)parameter;
+	printf("Message shared print test: %d \n", messageShared->distance1);
 	for(;;)
 	{
 		vTaskDelay(2500 / portTICK_PERIOD_MS);
@@ -67,6 +71,7 @@ void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 	printf("Distance: %d \n", recieved.distance1);
 }
 
+// ESP-NOW Configuration and registration
 void wireless_Open()
 {
 	WiFi.mode(WIFI_STA);
