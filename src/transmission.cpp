@@ -20,6 +20,7 @@ void vTransmitTask(void * parameter)
 void transmit(transcieve_message data)
 {
 	printf("data is %d \n", data.distance1);
+	printf("device num is %d \n", data.deviceNum);
 	// Transmits to any device in range
 	uint8_t transmitAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 	esp_now_peer_info_t peer = {};
@@ -68,7 +69,7 @@ void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 	memcpy(&recieved, data, sizeof(data));
 	printf("Bytes Recieved: %d \n", dataLen);
 
-	printf("Distance: %d \n", recieved.distance1);
+	printf("Received Distance: %d \n", recieved.distance1);
 }
 
 // ESP-NOW Configuration and registration

@@ -13,6 +13,9 @@ void vSensorTask(void * parameter)
 	{
 		printf("sEnSInG sTuFf \n");
 		vTaskDelay(8500 / portTICK_PERIOD_MS);
-		messageShared->distance1 = 420;
+		messageShared->distance1 = 69;
+		// messageShared->distance2 = 500;
+		// messageShared->distance3 = 5; 
+		messageShared->deviceNum = 2;
 	}
 }
