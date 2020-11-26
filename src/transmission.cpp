@@ -5,21 +5,21 @@
 void vTransmitTask(void * parameter)
 {
 	// message structure instance
-	transcieve_message message1;
-	transcieve_message * messageShared = (transcieve_message*)parameter;
+	transcieve_message * messageShared = (transcieve_message *)parameter;
 	printf("Message shared print test: %d \n", messageShared->distance1);
 	for(;;)
 	{
 		vTaskDelay(2500 / portTICK_PERIOD_MS);
 		printf("Transmitting data: \n");
-		message1.distance1 = 12;
-		transmit(message1);
+		// routinely transmitting the shared message that has the distance values updated by various sensor tasks
+		transmit(*(messageShared));
 	}
 	vTaskDelete(NULL);
 }
 
 void transmit(transcieve_message data)
 {
+	printf("data is %d \n", data.distance1);
 	// Transmits to any device in range
 	uint8_t transmitAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 	esp_now_peer_info_t peer = {};

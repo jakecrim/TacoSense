@@ -15,12 +15,23 @@ void transmit(transcieve_message data);
 void tasks_Open();
 
 
+// Scheduling the tasks 
+void tasks_Open(transcieve_message * messageShared)
+{
+	// shared message between threads
+	// transcieve_message messageShared;
+	messageShared->distance1 = 69;
+	xTaskCreate(vTransmitTask, "Transmit Task", TRANSMIT_TASK_STACK_SIZE, (void *) messageShared, TRANSMIT_TASK_PRIO, NULL);
+	xTaskCreate(vSensorTask, "Sensor Task", SENSOR_TASK_STACK_SIZE, (void *) messageShared, SENSOR_TASK_PRIO, NULL);
+}
+
 int main(void)
 {
 	printf("TacoSense System Start: \n");
-	tasks_Open();
+	transcieve_message messageShared;
 	sensors_Open();
 	wireless_Open();
+	tasks_Open(&messageShared);
 	for(;;)
 	{
 		delay(10000);
@@ -28,15 +39,7 @@ int main(void)
 	}
 }
 
-// Scheduling the tasks 
-void tasks_Open()
-{
-	// shared message between threads
-	struct transcieve_message messageShared;
-	messageShared.distance1 = 69;
-	xTaskCreate(vTransmitTask, "Transmit Task", TRANSMIT_TASK_STACK_SIZE, (void *) &messageShared, TRANSMIT_TASK_PRIO, NULL);
-	xTaskCreate(vSensorTask, "Sensor Task", SENSOR_TASK_STACK_SIZE, (void *) &messageShared, SENSOR_TASK_PRIO, NULL);
-}
+
 
 void setup() 
 {
