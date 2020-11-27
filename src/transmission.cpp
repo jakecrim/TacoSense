@@ -1,6 +1,16 @@
 #include "transmission.h"
 #include "sensor.h"
 
+// Constructor for transcieve_message struct
+transcieve_message::transcieve_message()
+{
+	deviceNum = 0;
+	distance1 = 0;
+	distance2 = 0;
+	distance3 = 1;
+}
+
+
 // Main Transmitting Task
 void vTransmitTask(void * parameter)
 {
@@ -9,7 +19,7 @@ void vTransmitTask(void * parameter)
 	printf("Message shared print test: %d \n", messageShared->distance1);
 	for(;;)
 	{
-		vTaskDelay(2500 / portTICK_PERIOD_MS);
+		vTaskDelay(250 / portTICK_PERIOD_MS);
 		printf("Transmitting data: \n");
 		// routinely transmitting the shared message that has the distance values updated by various sensor tasks
 		transmit(*(messageShared));
@@ -19,8 +29,16 @@ void vTransmitTask(void * parameter)
 
 void transmit(transcieve_message data)
 {
-	printf("data is %d \n", data.distance1);
-	printf("device num is %d \n", data.deviceNum);
+	printf("\n ------------ \n");
+	#if DEVICE_FRONT
+		printf("Transmitting Packet: \nF.L. ---> %d \n", data.distance1);
+		printf("F.M. ---> %d \n", data.distance2);
+		printf("F.R. ---> %d \n", data.distance3);
+	#endif
+	#if DEVICE_REAR 
+		printf("Transmitting Packet: \n Rear ---> %d \n", data.distance1);
+	#endif
+
 	// Transmits to any device in range
 	uint8_t transmitAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 	esp_now_peer_info_t peer = {};

@@ -35,7 +35,7 @@ int main(void)
 	for(;;)
 	{
 		delay(10000);
-		printf("Scheduled FreeRTOS Tasks Running... \n");
+		// printf("Scheduled FreeRTOS Tasks Running... \n");
 	}
 }
 

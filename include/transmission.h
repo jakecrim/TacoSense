@@ -6,10 +6,18 @@
 #include "TSconfig.h"
 
 /* Variables */
-typedef struct transcieve_message {
-	int distance1, distance2, distance3;
+// typedef struct transcieve_message {
+// 	int distance1, distance2, distance3;
+// 	int deviceNum;
+// } transcieve_message;
+
+struct transcieve_message {
 	int deviceNum;
-} transcieve_message;
+	int distance1, distance2, distance3;
+
+	// Constructor
+	transcieve_message();	
+};
 
 
 // Declarations
