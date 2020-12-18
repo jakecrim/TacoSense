@@ -22,14 +22,17 @@ void tasks_Open(transcieve_message * messageShared)
 	// transcieve_message messageShared;
 	messageShared->distance1 = 69;
 	xTaskCreate(vTransmitTask, "Transmit Task", TRANSMIT_TASK_STACK_SIZE, (void *) messageShared, TRANSMIT_TASK_PRIO, NULL);
-	xTaskCreate(vSensorTask, "Sensor Task", SENSOR_TASK_STACK_SIZE, (void *) messageShared, SENSOR_TASK_PRIO, NULL);
+	// xTaskCreate(vSensorTask, "Sensor Task", SENSOR_TASK_STACK_SIZE, (void *) messageShared, SENSOR_TASK_PRIO, NULL);
+	xTaskCreate(vSensorFLTask, "Sensor Front Left Task", SENSOR_TASK_STACK_SIZE, (void *) messageShared, SENSOR_TASK_PRIO, NULL);
+	// xTaskCreate(vSensorFMTask, "Sensor Front Middle Task", SENSOR_TASK_STACK_SIZE, (void *) messageShared, SENSOR_TASK_PRIO, NULL);
+	// xTaskCreate(vSensorFRTask, "Sensor Front Right Task", SENSOR_TASK_STACK_SIZE, (void *) messageShared, SENSOR_TASK_PRIO, NULL);
 }
 
 int main(void)
 {
 	printf("TacoSense System Start: \n");
 	transcieve_message messageShared;
-	sensors_Open();
+	sensors_Open((void *) &messageShared);
 	wireless_Open();
 	tasks_Open(&messageShared);
 	for(;;)

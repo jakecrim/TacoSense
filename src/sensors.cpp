@@ -1,8 +1,13 @@
 #include "sensors.h"
 #include "transmission.h"
 
-void sensors_Open()
+// variables
+static portMUX_TYPE senseMutex;
+
+void sensors_Open(void * parameter)
 {
+	transcieve_message * messageShared = (transcieve_message *)parameter;
+
 	printf("Initializing Sensor Hardware: \n");
 	pinMode(TRIG_F1, OUTPUT);
 	pinMode(ECHO_F1, INPUT);
@@ -10,23 +15,80 @@ void sensors_Open()
 	pinMode(ECHO_F2, INPUT);	
 	pinMode(TRIG_F3, OUTPUT);
 	pinMode(ECHO_F3, INPUT);
+	
+	// initialize mutex
+	vPortCPUInitializeMutex(&senseMutex);
+
+	#ifdef DEVICE_FRONT
+		messageShared->deviceNum = 1;
+	#endif
+
+	#ifdef DEVICE_BACK
+		messageShared->deviceNum = 2;
+	#endif
+
 }
 
-void vSensorTask(void * parameter)
+// void vSensorTask(void * parameter)
+// {
+// 	transcieve_message * messageShared = (transcieve_message *)parameter;
+
+// 	for(;;)
+// 	{
+// 		vTaskDelay(250 / portTICK_PERIOD_MS);
+// 		#ifdef DEVICE_FRONT
+// 			messageShared->deviceNum = 1;
+// 			messageShared->distance1 = senseDistance(1);
+// 			vTaskDelay(2 / portTICK_PERIOD_MS);
+// 			messageShared->distance2 = senseDistance(2);
+// 			vTaskDelay(2 / portTICK_PERIOD_MS);
+// 			messageShared->distance3 = senseDistance(3);
+// 		#endif
+// 	}
+// }
+
+void vSensorFLTask(void * parameter)
 {
 	transcieve_message * messageShared = (transcieve_message *)parameter;
 
 	for(;;)
 	{
 		vTaskDelay(250 / portTICK_PERIOD_MS);
-		#ifdef DEVICE_FRONT
-			messageShared->deviceNum = 1;
+		// enter critical
+		portENTER_CRITICAL(&senseMutex);
 			messageShared->distance1 = senseDistance(1);
-			vTaskDelay(2 / portTICK_PERIOD_MS);
+		// exit critical
+		portEXIT_CRITICAL(&senseMutex);
+	}
+}
+
+void vSensorFMTask(void * parameter)
+{
+	transcieve_message * messageShared = (transcieve_message *)parameter;
+
+	for(;;)
+	{
+		vTaskDelay(250 / portTICK_PERIOD_MS);
+		// enter critical
+		portENTER_CRITICAL(&senseMutex);
 			messageShared->distance2 = senseDistance(2);
-			vTaskDelay(2 / portTICK_PERIOD_MS);
+		// exit critical
+		portEXIT_CRITICAL(&senseMutex);
+	}
+}
+
+void vSensorFRTask(void * parameter)
+{
+	transcieve_message * messageShared = (transcieve_message *)parameter;
+
+	for(;;)
+	{
+		vTaskDelay(250 / portTICK_PERIOD_MS);
+		// enter critical
+		portENTER_CRITICAL(&senseMutex);
 			messageShared->distance3 = senseDistance(3);
-		#endif
+		// exit critical
+		portEXIT_CRITICAL(&senseMutex);
 	}
 }
 

@@ -12,6 +12,9 @@
 #define ECHO_F3 16
 
 // Declarations
-void sensors_Open(void);
+void sensors_Open(void * parameter);
 void vSensorTask(void * parameter);
+void vSensorFLTask(void * parameter);
+void vSensorFMTask(void * parameter);
+void vSensorFRTask(void * parameter);
 int senseDistance(int);
